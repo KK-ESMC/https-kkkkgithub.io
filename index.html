@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天赋能力测试报告</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
+:root{
+    --main:#d8f3dc;
+    --dark:#2b6744;
+    --text:#333;
+    --light:#f7fff9;
+}
+body{background-color:var(--light);color:var(--text);padding:16px;position:relative;overflow-x:hidden;}
+/* 可爱装饰图案 */
+.deco-leaf{position:absolute;opacity:0.3;z-index:0;pointer-events:none;}
+.deco-star{position:absolute;opacity:0.25;z-index:0;pointer-events:none;}
+.deco-dot{position:absolute;border-radius:50%;background:#b7e4c7;opacity:0.3;z-index:0;pointer-events:none;}
+.wrap{max-width:720px;margin:0 auto;position:relative;z-index:1;background:#fff;border-radius:20px;padding:24px;box-shadow:0 4px 16px rgba(43,103,68,0.1);}
+.page{display:none;}
+.page.active{display:block !important;}
+/* 封面页 */
+#page-home{text-align:center;padding:40px 20px;position:relative;}
+#page-home h1{color:var(--dark);font-size:28px;margin-bottom:16px;}
+#page-home p{color:#555;margin-bottom:24px;line-height:1.7;}
+.btn{background-color:var(--main);color:var(--dark);border:none;padding:14px 32px;border-radius:99px;font-size:16px;font-weight:bold;cursor:pointer;transition:0.2s;margin:6px;}
+.btn:hover{background:#b7e4c7;}
+.btn-submit{background-color:#74c69d;color:#fff;}
+/* 题目页 */
+.question-box{margin-bottom:30px;}
+.question-title{font-size:17px;margin-bottom:14px;color:#2d4a3b;font-weight:500;}
+.option-item{border:1px solid #e6f4ec;border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;transition:0.2s;}
+.option-item:hover{background:#f0fbf5;border-color:#b7e4c7;}
+.option-item.selected{background:var(--main);border-color:var(--dark);}
+.progress{height:8px;background:#eee;border-radius:99px;margin-bottom:20px;overflow:hidden;}
+.progress-bar{height:100%;width:0%;background:#74c69d;transition:0.3s;}
+.nav-row{display:flex;justify-content:space-between;margin-top:24px;gap:12px;flex-wrap:wrap;}
+/* 报告页 */
+.report-head{text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e6f4ec;position:relative;}
+.chart-box{width:100%;max-width:400px;margin:0 auto 30px;}
+.report-block{background:#f7fff9;border-radius:16px;padding:20px;margin-bottom:18px;}
+.report-block h3{color:var(--dark);margin-bottom:10px;font-size:18px;}
+.report-block p{line-height:1.7;color:#444;}
+.print-btn-wrap{text-align:center;margin:24px 0;}
+@media print{
+    body{background:#fff;}
+    .wrap{box-shadow:none;padding:0;}
+    .print-btn-wrap,.nav-row{display:none !important;}
+}
+@media (max-width:500px){
+    .wrap{padding:16px;}
+    #page-home h1{font-size:24px;}
+}
+</style>
+</head>
+<body>
+<!-- 全局可爱装饰SVG图案 -->
+<svg class="deco-leaf" style="top:40px;left:10px;width:60px;" viewBox="0 0 100 100">
+<path fill="#52b788" d="M50,5 C70,30 90,60 50,95 C10,60 30,30 50,5Z"/>
+</svg>
+<svg class="deco-leaf" style="bottom:80px;right:12px;width:45px;" viewBox="0 0 100 100">
+<path fill="#52b788" d="M50,5 C70,30 90,60 50,95 C10,60 30,30 50,5Z"/>
+</svg>
+<svg class="deco-star" style="top:120px;right:30px;width:32px;" viewBox="0 0 100 100">
+<path fill="#40916c" d="M50,0 L61,38 L100,38 L68,60 L79,97 L50,75 L21,97 L32,60 L0,38 L39,38Z"/>
+</svg>
+<svg class="deco-star" style="bottom:140px;left:24px;width:24px;" viewBox="0 0 100 100">
+<path fill="#40916c" d="M50,0 L61,38 L100,38 L68,60 L79,97 L50,75 L21,97 L32,60 L0,38 L39,38Z"/>
+</svg>
+<div class="deco-dot" style="width:22px;height:22px;top:220px;left:40px;"></div>
+<div class="deco-dot" style="width:16px;height:16px;bottom:220px;right:50px;"></div>
+
+<div class="wrap">
+    <!-- 封面首页 -->
+    <div id="page-home" class="page active">
+        <svg class="deco-leaf" style="top:10px;left:10px;width:50px;" viewBox="0 0 100 100">
+        <path fill="#52b788" d="M50,5 C70,30 90,60 50,95 C10,60 30,30 50,5Z"/>
+        </svg>
+        <svg class="deco-star" style="top:40px;right:20px;width:30px;" viewBox="0 0 100 100">
+        <path fill="#40916c" d="M50,0 L61,38 L100,38 L68,60 L79,97 L50,75 L21,97 L32,60 L0,38 L39,38Z"/>
+        </svg>
+        <h1>🍃 天赋能力测试报告</h1>
+        <p>一共30道选择题，请凭第一直觉选择最贴合你的选项<br>完成全部题目后点击提交，生成专属天赋能力报告，包含天赋解读、优势短板与成长建议</p>
+        <button class="btn" onclick="startTest()">开始测试</button>
+    </div>
+
+    <!-- 答题页面 -->
+    <div id="page-question" class="page">
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div id="question-container"></div>
+        <div class="nav-row">
+            <button class="btn" onclick="prevQuestion()">上一题</button>
+            <button id="nextBtn" class="btn" onclick="nextQuestion()">下一题</button>
+            <button id="submitBtn" class="btn btn-submit" onclick="submitTest()" style="display:none">✅提交生成报告</button>
+        </div>
+    </div>
+
+    <!-- 最终报告页面 -->
+    <div id="page-report" class="page">
+        <div class="report-head">
+            <svg class="deco-leaf" style="top:10px;left:10px;width:40px;" viewBox="0 0 100 100">
+            <path fill="#52b788" d="M50,5 C70,30 90,60 50,95 C10,60 30,30 50,5Z"/>
+            </svg>
+            <svg class="deco-star" style="top:20px;right:10px;width:28px;" viewBox="0 0 100 100">
+            <path fill="#40916c" d="M50,0 L61,38 L100,38 L68,60 L79,97 L50,75 L21,97 L32,60 L0,38 L39,38Z"/>
+            </svg>
+            <h2>🍃 你的天赋能力测试报告</h2>
+            <p>测试完成时间：<span id="report-time"></span></p>
+        </div>
+        <div class="chart-box">
+            <canvas id="talentChart"></canvas>
+        </div>
+        <div id="report-content"></div>
+        <div class="print-btn-wrap">
+            <button class="btn" onclick="window.print()">🖨️ 一键打印报告</button>
+            <button class="btn" onclick="restartTest()">重新测试</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 天赋维度：逻辑思维、人际共情、创意想象、执行实干
+const talentTypes = ["逻辑思维", "人际共情", "创意想象", "执行实干"];
+// 30道题目
+const questions = [
+    {q:"1.遇到难题，你更倾向？",o:["A.拆解问题，理性分析","B.找人沟通，听取建议","C.脑洞发散，寻找新奇方案","D.立刻动手，一步步落地"]},
+    {q:"2.空闲时间，你更喜欢？",o:["A.看书学习、研究原理","B.和朋友聊天聚会","C.画画、写故事、构思想法","D.整理房间、完成待办清单"]},
+    {q:"3.团队任务里你习惯？",o:["A.梳理规则，找出漏洞","B.照顾同伴情绪，协调关系","C.提出新颖思路","D.按时把任务做完"]},
+    {q:"4.别人评价你最常是？",o:["A.理性冷静","B.善解人意","C.想法天马行空","D.踏实靠谱"]},
+    {q:"5.计划被打乱时你会？",o:["A.重新评估利弊，调整方案","B.和他人商量如何应对","C.顺势想出新玩法","D.尽量回到原定计划"]},
+    {q:"6.学习新知识，偏爱？",o:["A.理解底层原理","B.案例故事与人经验","C.自由探索联想","D.固定步骤练习"]},
+    {q:"7.做决定依靠？",o:["A.数据事实逻辑","B.感受他人与自身情绪","C.直觉灵感","D.过往经验惯例"]},
+    {q:"8.看到别人难过，你第一反应？",o:["A.分析原因给出解决方案","B.共情安抚情绪","C.想象对方经历的画面","D.帮对方处理实际琐事"]},
+    {q:"9.做项目你更看重？",o:["A.逻辑严谨不出错","B.团队氛围和谐","C.创意独特有亮点","D.准时交付完成"]},
+    {q:"10.面对争论你一般？",o:["A.摆道理辩明对错","B.缓和气氛避免冲突","C.跳出框架换角度思考","D.就事尽快收尾"]},
+    {q:"11.灵感出现时你会？",o:["A.验证想法可行性","B.和别人分享讨论","C.立刻记录构思细节","D.安排时间落地执行"]},
+    {q:"12.挑选工作，优先？",o:["A.需要思考推理的任务","B.与人交流协作的工作","C.可以自由创作的内容","D.流程清晰稳定的任务"]},
+    {q:"13.记住一件事靠？",o:["A.理解逻辑框架","B.情感印象故事","C.画面想象","D.重复实操记忆"]},
+    {q:"14.犯错之后，首先？",o:["A.复盘寻找根源","B.担心影响他人感受","C.思考有没有别的可能性","D.快速补救完成"]},
+    {q:"15.看电影，更在意？",o:["A.剧情逻辑是否通顺","B.人物情感是否动人","C.画面设定想象力","D.故事节奏完整度"]},
+    {q:"16.解决新问题，优先？",o:["A.查阅资料推导方案","B.请教有经验的人","C.尝试多种新奇办法","D.参考成熟流程"]},
+    {q:"17.你更讨厌？",o:["A.逻辑混乱没有依据","B.冷漠无视他人感受","C.死板一成不变","D.计划频繁变动"]},
+    {q:"18.写东西时，重点？",o:["A.条理清晰论证完整","B.打动读者情感","C.文字富有想象力","D.简洁实用不出差错"]},
+    {q:"19.参与活动，喜欢？",o:["A.策划规则与流程","B.组织大家互动","C.设计创意环节","D.负责落地执行"]},
+    {q:"20.接收信息，容易注意？",o:["A.事实数据","B.情绪语气","C.画面联想","D.实操方法"]},
+    {q:"21.压力大的时候你会？",o:["A.独自梳理问题","B.找人倾诉聊天","C.幻想放松场景","D.完成小事获得掌控感"]},
+    {q:"22.评价一件作品，看重？",o:["A.结构严谨","B.情感共鸣","C.创意独特","D.做工完整"]},
+    {q:"23.学习目标，你想要？",o:["A.掌握原理看透本质","B.提升人际理解能力","C.拓展创意表达","D.熟练掌握实操技能"]},
+    {q:"24.收到批评第一反应？",o:["A.客观判断对错","B.在意对方态度感受","C.思考新改进方向","D.尽快修正问题"]},
+    {q:"25.规划旅行，你喜欢？",o:["A.研究路线利弊","B.照顾同行人的喜好","C.发掘小众新奇地点","D.安排稳定行程"]},
+    {q:"26.做选择，不喜欢？",o:["A.凭感觉无理由决定","B.不顾别人感受的选择","C.重复老旧方案","D.没有时间准备"]},
+    {q:"27.沟通时，习惯？",o:["A.简明陈述事实","B.顾及对方情绪","C.比喻想象讲故事","D.给出明确行动"]},
+    {q:"28.遇到未知领域，你？",o:["A.研究理论体系","B.向领域前辈请教","C.自由尝试探索","D.一步步跟着教程练习"]},
+    {q:"29.你的想法容易？",o:["A.严谨可验证","B.温暖共情","C.丰富有想象力","D.务实落地"]},
+    {q:"30.长期发展你更想发挥？",o:["A.分析推理天赋","B.共情沟通天赋","C.创意创造天赋","D.踏实执行天赋"]},
+];
+// A逻辑 B人际 C创意 D执行
+const scoreMap = {A:0,B:1,C:2,D:3};
+
+let currentQuestion = 0;
+let answers = Array(questions.length).fill(null);
+let talentChart = null;
+
+// 切换页面
+function showPage(pageId){
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(p=>{
+        p.classList.remove('active');
+    })
+    document.getElementById(pageId).classList.add('active');
+}
+
+function startTest(){
+    currentQuestion = 0;
+    answers = Array(questions.length).fill(null);
+    renderQuestion();
+    showPage("page-question");
+}
+
+function renderQuestion(){
+    const item = questions[currentQuestion];
+    const container = document.getElementById("question-container");
+    let html = `<div class="question-box">
+        <div class="question-title">${item.q}</div>`;
+    item.o.forEach((opt,i)=>{
+        const val = opt[0];
+        const selected = answers[currentQuestion] === val ? "selected":"";
+        html += `<div class="option-item ${selected}" onclick="selectOption('${val}')">${opt}</div>`;
+    })
+    html += "</div>";
+    container.innerHTML = html;
+    // 更新进度条
+    const percent = ((currentQuestion+1)/questions.length)*100;
+    document.getElementById("progressBar").style.width = percent+"%";
+
+    // 判断是否最后一题：显示提交按钮，隐藏下一题
+    if(currentQuestion === questions.length - 1){
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("submitBtn").style.display = "inline-block";
+    }else{
+        document.getElementById("nextBtn").style.display = "inline-block";
+        document.getElementById("submitBtn").style.display = "none";
+    }
+}
+
+function selectOption(val){
+    answers[currentQuestion] = val;
+    renderQuestion();
+}
+
+function nextQuestion(){
+    if(currentQuestion < questions.length - 1){
+        currentQuestion++;
+        renderQuestion();
+    }
+}
+function prevQuestion(){
+    if(currentQuestion>0){
+        currentQuestion--;
+        renderQuestion();
+    }
+}
+
+// ===== 提交函数【重点修改】=====
+function submitTest(){
+    // 检查是否有空题目
+    const hasUnfinished = answers.some(item => item === null);
+    if(hasUnfinished){
+        alert("⚠️ 还有题目未完成，请全部作答完毕再提交！");
+        return;
+    }
+
+    // ✅ 第一步：先切换页面，让报告页面DOM显示出来！
+    showPage("page-report");
+
+    // ✅ 第二步：延迟一点点，等待页面渲染完成后，再计算+画饼图
+    setTimeout(function(){
+        calcResult();
+    },100);
+}
+
+// 计算得分
+function calcResult(){
+    let scores = [0,0,0,0];
+    answers.forEach(ans=>{
+        if(ans){
+            const idx = scoreMap[ans];
+            scores[idx] +=1;
+        }
+    });
+    drawChart(scores);
+    generateReport(scores);
+    document.getElementById("report-time").innerText = new Date().toLocaleString();
+}
+
+function drawChart(scores){
+    const ctx = document.getElementById("talentChart").getContext("2d");
+    if(talentChart){
+        talentChart.destroy();
+    }
+    talentChart = new Chart(ctx,{
+        type:"pie",
+        data:{
+            labels:talentTypes,
+            datasets:[{
+                data:scores,
+                backgroundColor:["#74c69d","#52b788","#40916c","#2b6744"]
+            }]
+        },
+        options:{
+            responsive:true,
+            maintainAspectRatio:true,
+            plugins:{
+                title:{display:true,text:"天赋维度分布占比",font:{size:16}},
+                legend:{position:"bottom"}
+            }
+        }
+    })
+}
+
+function generateReport(scores){
+    const maxIndex = scores.indexOf(Math.max(...scores));
+    const mainTalent = talentTypes[maxIndex];
+    let reportHtml = "";
+    // 详细报告文案
+    const reportText = {
+        "逻辑思维":{
+            desc:"你拥有突出的逻辑分析天赋，擅长拆解复杂问题、辨别信息真伪，习惯用理性视角看待事物。面对难题时不容易被情绪裹挟，能够快速抓住事物底层规律。",
+            advantage:"✨个人优势：归纳推理能力强，擅长梳理框架、寻找因果关系；学习抽象理论、数据分析、策略规划类内容上手更快；遇到混乱局面可以冷静抽丝剥茧，找到问题根源。适合研究、策划、数据分析、技术、法律等方向。",
+            weakness:"⚠️个人短板：容易过度理性，忽略他人情绪感受；有时纠结细节论证，行动启动较慢；对于没有客观标准答案的感性创作类任务，容易感到无从下手；容易下意识评判对错，在人际沟通中造成距离感。",
+            advice:"🌱发展建议：刻意练习共情能力，做决定前多留意身边人的情绪；不要无限期准备分析，给自己设置截止时间，学会边做边调整；尝试接触艺术、文学类内容，锻炼感性感知力；沟通时减少辩论感，先倾听再表达观点。"
+        },
+        "人际共情":{
+            desc:"你拥有优秀的人际共情天赋，敏锐捕捉他人情绪变化，善于理解别人想法，拥有很强的同理心。在人与人的协作场景里，你很容易感知氛围变化，擅长维系关系。",
+            advantage:"✨个人优势：共情力强，善于倾听，协调冲突；可以快速感知他人需求，沟通亲和力强；团队里是很好的协调者，擅长服务、教育、咨询、人文类工作；善于换位思考，很容易获得他人信任。",
+            weakness:"⚠️个人短板：容易吸收别人负面情绪，造成精神内耗；做决策容易被他人感受绑架，难以坚持自己立场；不太喜欢冰冷复杂的数据推理；有时为了照顾别人感受，委屈自己。",
+            advice:"🌱发展建议：建立情绪边界，学会区分他人情绪与自己情绪；练习理性决策方法，学会客观权衡利弊；适当学习逻辑工具，平衡感性判断；学会勇敢拒绝，优先尊重自己真实需求。"
+        },
+        "创意想象":{
+            desc:"你拥有出众的创意想象天赋，直觉丰富，联想能力强，讨厌死板规则。脑海里经常浮现新奇想法，擅长跳出固有框架，喜欢探索多种可能性。",
+            advantage:"✨个人优势：想象力丰富，灵感源源不断；擅长创新、构思故事、视觉创作；不被传统思维束缚，适合设计、文案、艺术、新媒体、策划等创意类方向；面对未知场景能快速打开新思路。",
+            weakness:"⚠️个人短板：想法很多但落地执行力偏弱；容易三分钟热度，难以长期坚持枯燥重复工作；讨厌固定流程与条条框框，计划容易半途而废；细节把控与严谨度不足。",
+            advice:"🌱发展建议：学习简单的任务管理方法，把创意拆解成可执行小步骤；给自己设置阶段性目标，培养持续落地能力；适当学习基础逻辑，让创意方案更具备可行性；学会筛选想法，不要同时开启太多项目。"
+        },
+        "执行实干":{
+            desc:"你拥有强大的执行实干天赋，踏实稳重，重视规则与结果，擅长把计划转化成现实。你耐心可靠，能够稳定持续完成重复性任务，说到做到。",
+            advantage:"✨个人优势：责任心强，做事靠谱，信守承诺；擅长按流程稳步推进，抗压能力强；重视细节落实，适合项目落地、运营管理、行政、技术实操类工作；在团队里是稳定可靠的执行者。",
+            weakness:"⚠️个人短板：偏向依赖过往经验，不太愿意尝试全新方式；面对没有固定方案的开放性创新任务容易不知所措；有时墨守成规，不擅长灵活变通；不太喜欢抽象理论探讨。",
+            advice:"🌱发展建议：主动尝试跳出固有经验，定期接触新方法新思路；适度练习发散思考，锻炼创意构思能力；学习长远规划，不只盯着眼前任务；在合适场景下敢于提出不一样的方案。"
+        }
+    }
+    const data = reportText[mainTalent];
+    reportHtml += `
+<div class="report-block">
+<h3>🌟核心天赋特质：${mainTalent}</h3>
+<p>${data.desc}</p>
+</div>
+<div class="report-block">
+<h3>✅个人优势</h3>
+<p>${data.advantage}</p>
+</div>
+<div class="report-block">
+<h3>📌个人短板</h3>
+<p>${data.weakness}</p>
+</div>
+<div class="report-block">
+<h3>📖发展建议</h3>
+<p>${data.advice}</p>
+</div>
+<div class="report-block">
+<h3>💡补充说明</h3>
+<p>本测试为天赋倾向测评，不是能力定论。每个人同时拥有多种天赋，只是强弱不同。你可以发挥优势赛道，同时补齐短板，全方位成长。</p>
+</div>`;
+    document.getElementById("report-content").innerHTML = reportHtml;
+}
+
+function restartTest(){
+    showPage("page-home");
+}
+</script>
+</body>
+</html>
